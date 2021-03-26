@@ -7,8 +7,8 @@ import (
 	"net/http"
 	"strings"
 
-	tgbotapi "gopkg.in/telegram-bot-api.v4"
 	"github.com/spf13/viper"
+	tgbotapi "gopkg.in/telegram-bot-api.v4"
 )
 
 const (
@@ -32,7 +32,7 @@ func main() {
 
 	bot, err := tgbotapi.NewBotAPI(botToken)
 	if err != nil {
-			panic(err)
+		panic(err)
 	}
 
 	fmt.Printf("Authorized on account %s\n", bot.Self.UserName)
@@ -42,23 +42,23 @@ func main() {
 
 	updates, err := bot.GetUpdatesChan(u)
 	for update := range updates {
-			if update.Message == nil { // ignore any non-Message Updates
-					continue
+		if update.Message == nil { // ignore any non-Message Updates
+			continue
+		}
+
+		ln := strings.ToLower(update.Message.Text)
+
+		if strings.Contains(ln, "сиськ") {
+			feed, _ := getRandomItem()
+
+			for _, item := range feed.Items {
+				msg := tgbotapi.NewMessage(update.Message.Chat.ID, MediaURL+item.Preview)
+				bot.Send(msg)
 			}
-
-			ln := strings.ToLower(update.Message.Text)
-
-			if strings.Contains(ln, "сиськ") {
-					feed, _ := getRandomItem()
-
-					for _, item := range feed.Items {
-							msg := tgbotapi.NewMessage(update.Message.Chat.ID, MediaURL+item.Preview)
-							bot.Send(msg)
-					}
-			} else if ln == "да" {
-					msg := tgbotapi.NewMessage(update.Message.Chat.ID, "пизда")
-					bot.Send(msg)
-			}
+		} else if ln == "да" {
+			msg := tgbotapi.NewMessage(update.Message.Chat.ID, "пизда")
+			bot.Send(msg)
+		}
 	}
 }
 
@@ -73,7 +73,7 @@ func requestItems(url string) (*Feed, error) {
 	resp, err := http.Get(url)
 
 	if err != nil {
-			return nil, err
+		return nil, err
 	}
 
 	defer resp.Body.Close()
@@ -94,6 +94,6 @@ func viperEnvVariable(key string) string {
 	if !ok {
 		fmt.Printf("Invalid type assertion")
 	}
-  
+
 	return value
-  }
+}
