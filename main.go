@@ -1,27 +1,15 @@
 package main
 
 import (
-	"encoding/json"
 	"fmt"
-	"io/ioutil"
-	"net/http"
-	"strings"
 
 	"github.com/spf13/viper"
 	tgbotapi "gopkg.in/telegram-bot-api.v4"
 )
 
-const (
-	ApiURL   = "http://api.oboobs.ru/boobs/"
-	MediaURL = "http://media.oboobs.ru/"
-)
-
-type Feed struct {
-	Items []Item
-}
-
-type Item struct {
-	Preview string
+type command interface {
+	canRun(update tgbotapi.Update) bool
+	run(update tgbotapi.Update)
 }
 
 func main() {
@@ -35,6 +23,11 @@ func main() {
 		panic(err)
 	}
 
+	var commands = []command{
+		boobCommand{bot},
+		yesCommand{bot},
+	}
+
 	fmt.Printf("Authorized on account %s\n", bot.Self.UserName)
 
 	u := tgbotapi.NewUpdate(0)
@@ -46,46 +39,12 @@ func main() {
 			continue
 		}
 
-		ln := strings.ToLower(update.Message.Text)
-
-		if strings.Contains(ln, "сиськ") {
-			feed, _ := getRandomItem()
-
-			for _, item := range feed.Items {
-				msg := tgbotapi.NewMessage(update.Message.Chat.ID, MediaURL+item.Preview)
-				bot.Send(msg)
+		for _, c := range commands {
+			if c.canRun(update) {
+				c.run(update)
 			}
-		} else if ln == "да" {
-			msg := tgbotapi.NewMessage(update.Message.Chat.ID, "пизда")
-			bot.Send(msg)
 		}
 	}
-}
-
-func getRandomItem() (*Feed, error) {
-	url := ApiURL + "0/1/random"
-	feed, error := requestItems(url)
-
-	return feed, error
-}
-
-func requestItems(url string) (*Feed, error) {
-	resp, err := http.Get(url)
-
-	if err != nil {
-		return nil, err
-	}
-
-	defer resp.Body.Close()
-	body, _ := ioutil.ReadAll(resp.Body)
-
-	var items []Item
-	err = json.Unmarshal(body, &items)
-
-	feed := new(Feed)
-	feed.Items = items
-
-	return feed, nil
 }
 
 func viperEnvVariable(key string) string {
