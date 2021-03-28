@@ -2,8 +2,9 @@ package main
 
 import (
 	"fmt"
+	"log"
+	"net/http"
 
-	"github.com/spf13/viper"
 	tgbotapi "gopkg.in/telegram-bot-api.v4"
 )
 
@@ -13,10 +14,9 @@ type command interface {
 }
 
 func main() {
-	viper.AutomaticEnv()
-	viper.SetEnvPrefix("bbot")
-
-	botToken := viperEnvVariable("token")
+	botToken := getEnv("token")
+	webhookUrl := getEnv("webhook_url")
+	baseUrl := getEnv("base_url")
 
 	bot, err := tgbotapi.NewBotAPI(botToken)
 	if err != nil {
@@ -30,10 +30,23 @@ func main() {
 
 	fmt.Printf("Authorized on account %s\n", bot.Self.UserName)
 
-	u := tgbotapi.NewUpdate(0)
-	u.Timeout = 60
+	_, err = bot.SetWebhook(tgbotapi.NewWebhook(webhookUrl + bot.Token))
+	if err != nil {
+		log.Fatal(err)
+	}
 
-	updates, err := bot.GetUpdatesChan(u)
+	info, err := bot.GetWebhookInfo()
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	if info.LastErrorDate != 0 {
+		log.Printf("Telegram callback failed: %s", info.LastErrorMessage)
+	}
+
+	updates := bot.ListenForWebhook("/bbot/" + bot.Token)
+	go http.ListenAndServe(baseUrl, nil)
+
 	for update := range updates {
 		if update.Message == nil { // ignore any non-Message Updates
 			continue
@@ -45,14 +58,4 @@ func main() {
 			}
 		}
 	}
-}
-
-func viperEnvVariable(key string) string {
-	value, ok := viper.Get(key).(string)
-
-	if !ok {
-		fmt.Printf("Invalid type assertion")
-	}
-
-	return value
 }
