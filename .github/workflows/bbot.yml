@@ -1,5 +1,5 @@
 on: [push]
-name: Simple Oboobs API bot
+name: build
 jobs:
   test:
     strategy:
