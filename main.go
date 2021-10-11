@@ -7,6 +7,14 @@ import (
 	"net/http"
 )
 
+type Feed struct {
+	Items []Item
+}
+
+type Item struct {
+	Preview string
+}
+
 type command interface {
 	canRun(update tgbotapi.Update) bool
 	run(update tgbotapi.Update)
@@ -29,6 +37,7 @@ func main() {
 
 	var commands = []command{
 		boobCommand{bot},
+		buttCommand{bot},
 		yesCommand{bot},
 	}
 

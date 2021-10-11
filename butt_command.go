@@ -10,37 +10,37 @@ import (
 )
 
 const (
-	ApiURL   = "http://api.oboobs.ru/boobs/"
-	MediaURL = "http://media.oboobs.ru/"
+	BootApiURL   = "http://api.obutts.ru/butts/"
+	BootMediaURL = "http://media.obutts.ru/"
 )
 
-type boobCommand struct {
+type buttCommand struct {
 	bot *tgbotapi.BotAPI
 }
 
-func (c boobCommand) canRun(update tgbotapi.Update) bool {
+func (c buttCommand) canRun(update tgbotapi.Update) bool {
 	ln := strings.ToLower(update.Message.Text)
 
-	return strings.Contains(ln, "сиськ")
+	return strings.Contains(ln, "жоп")
 }
 
-func (c boobCommand) run(update tgbotapi.Update) {
+func (c buttCommand) run(update tgbotapi.Update) {
 	feed, _ := c.getRandomItem()
 
 	for _, item := range feed.Items {
-		msg := tgbotapi.NewMessage(update.Message.Chat.ID, MediaURL+item.Preview)
+		msg := tgbotapi.NewMessage(update.Message.Chat.ID, BootMediaURL+item.Preview)
 		c.bot.Send(msg)
 	}
 }
 
-func (c boobCommand) getRandomItem() (*Feed, error) {
-	url := ApiURL + "0/1/random"
+func (c buttCommand) getRandomItem() (*Feed, error) {
+	url := BootApiURL + "0/1/random"
 	feed, error := c.requestItems(url)
 
 	return feed, error
 }
 
-func (c boobCommand) requestItems(url string) (*Feed, error) {
+func (c buttCommand) requestItems(url string) (*Feed, error) {
 	resp, err := http.Get(url)
 
 	if err != nil {
