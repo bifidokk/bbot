@@ -2,10 +2,9 @@ package main
 
 import (
 	"fmt"
+	tgbotapi "gopkg.in/telegram-bot-api.v4"
 	"log"
 	"net/http"
-
-	tgbotapi "gopkg.in/telegram-bot-api.v4"
 )
 
 type command interface {
@@ -17,6 +16,11 @@ func main() {
 	botToken := getEnv("token")
 	webhookUrl := getEnv("webhook_url")
 	baseUrl := getEnv("base_url")
+
+	webhookPath := getEnv("webhook_path")
+	if len(webhookPath) == 0 {
+		webhookPath = "/"
+	}
 
 	bot, err := tgbotapi.NewBotAPI(botToken)
 	if err != nil {
@@ -30,7 +34,7 @@ func main() {
 
 	fmt.Printf("Authorized on account %s\n", bot.Self.UserName)
 
-	_, err = bot.SetWebhook(tgbotapi.NewWebhook(webhookUrl + bot.Token))
+	_, err = bot.SetWebhook(tgbotapi.NewWebhook(webhookUrl + webhookPath + bot.Token))
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -44,7 +48,7 @@ func main() {
 		log.Printf("Telegram callback failed: %s", info.LastErrorMessage)
 	}
 
-	updates := bot.ListenForWebhook("/bbot/" + bot.Token)
+	updates := bot.ListenForWebhook(webhookPath + bot.Token)
 	go http.ListenAndServe(baseUrl, nil)
 
 	for update := range updates {
