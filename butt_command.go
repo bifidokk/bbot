@@ -10,8 +10,8 @@ import (
 )
 
 const (
-	BootApiURL   = "http://api.obutts.ru/butts/"
-	BootMediaURL = "http://media.obutts.ru/"
+	ButtApiURL   = "http://api.obutts.ru/butts/"
+	ButtMediaURL = "http://media.obutts.ru/"
 )
 
 type buttCommand struct {
@@ -28,13 +28,13 @@ func (c buttCommand) run(update tgbotapi.Update) {
 	feed, _ := c.getRandomItem()
 
 	for _, item := range feed.Items {
-		msg := tgbotapi.NewMessage(update.Message.Chat.ID, BootMediaURL+item.Preview)
+		msg := tgbotapi.NewMessage(update.Message.Chat.ID, ButtMediaURL+item.Preview)
 		c.bot.Send(msg)
 	}
 }
 
 func (c buttCommand) getRandomItem() (*Feed, error) {
-	url := BootApiURL + "0/1/random"
+	url := ButtApiURL + "0/1/random"
 	feed, error := c.requestItems(url)
 
 	return feed, error
