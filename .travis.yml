@@ -4,7 +4,6 @@ services:
   - docker
 
 before_install:
-  - cd ./complex
   - docker build -t bifidokk/bbot .
 
 after_success:
