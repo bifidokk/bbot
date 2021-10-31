@@ -16,4 +16,4 @@ after_success:
   - echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_ID" --password-stdin
   - docker push bifidokk/bbot
 
-  - ssh -i ./deploy_key $SERVER_USER@$SERVER_IP docker ps
+  - ssh -i ./deploy_key $SERVER_USER@$SERVER_IP docker pull bifidokk/bbot:latest && docker stop bbot && docker rm bbot && docker run --name bbot --env BBOT_TOKEN=$BBOT_TOKEN --env BBOT_BASE_URL=$BBOT_BASE_URL --env BBOT_WEBHOOK_URL=$BBOT_WEBHOOK_URL --env BBOT_WEBHOOK_PATH=$BBOT_WEBHOOK_PATH -p $PORTS -d bifidokk/bbot:latest
