@@ -39,6 +39,7 @@ func main() {
 		boobCommand{bot},
 		buttCommand{bot},
 		yesCommand{bot},
+		stickerCommand{bot},
 	}
 
 	fmt.Printf("Authorized on account %s\n", bot.Self.UserName)
