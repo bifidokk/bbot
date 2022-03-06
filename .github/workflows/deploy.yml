@@ -38,6 +38,11 @@ jobs:
           script: |
             docker pull bifidokk/bbot:latest
             echo $BBOT_PORTS
+            echo ${{ secrets.BBOT_PORTS }}
+            echo $BBOT_BASE_URL
+            echo $BBOT_WEBHOOK_URL
+            echo $BBOT_WEBHOOK_PATH
+            
             docker stop bbot
             docker rm -f bbot
             docker run --name bbot --env BBOT_TOKEN=$BBOT_TOKEN --env BBOT_BASE_URL=$BBOT_BASE_URL --env BBOT_WEBHOOK_URL=$BBOT_WEBHOOK_URL --env BBOT_WEBHOOK_PATH=$BBOT_WEBHOOK_PATH -p $BBOT_PORTS -d bifidokk/bbot:latest
