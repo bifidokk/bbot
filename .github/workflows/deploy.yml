@@ -39,4 +39,4 @@ jobs:
             docker pull bifidokk/bbot:latest
             docker stop bbot
             docker rm -f bbot
-            docker run --name bbot --env BBOT_TOKEN=$BBOT_TOKEN --env BBOT_BASE_URL=$BBOT_BASE_URL --env BBOT_WEBHOOK_URL=$BBOT_WEBHOOK_URL --env BBOT_WEBHOOK_PATH=$BBOT_WEBHOOK_PATH -p $PORTS -d bifidokk/bbot:latest
+            docker run --name bbot --env BBOT_TOKEN=$BBOT_TOKEN --env BBOT_BASE_URL=$BBOT_BASE_URL --env BBOT_WEBHOOK_URL=$BBOT_WEBHOOK_URL --env BBOT_WEBHOOK_PATH=$BBOT_WEBHOOK_PATH -p $BBOT_PORTS -d bifidokk/bbot:latest
