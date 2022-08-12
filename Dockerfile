@@ -18,4 +18,4 @@ WORKDIR /app
 COPY --from=builder /app .
 
 EXPOSE 9000
-CMD ["./main"]
+CMD ["./main >> bbot.log"]
