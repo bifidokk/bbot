@@ -19,6 +19,7 @@ type buttCommand struct {
 }
 
 func (c buttCommand) canRun(update tgbotapi.Update) bool {
+	return false
 	ln := strings.ToLower(update.Message.Text)
 
 	return strings.Contains(ln, "жоп")
