@@ -47,31 +47,37 @@ func downloadVideo(c videoCommand, videoId string, update tgbotapi.Update) {
 
 	video, err := client.GetVideo(videoId)
 	if err != nil {
-		panic(err)
+		log.Println(err)
+		return
 	}
 
 	formats := video.Formats.WithAudioChannels()
 	stream, _, err := client.GetStream(video, &formats[0])
 	if err != nil {
-		panic(err)
+		return
 	}
 
 	file, err := os.Create("/tmp/video.mp4")
 	if err != nil {
-		panic(err)
+		log.Println(err)
+		return
 	}
 
 	defer file.Close()
 
 	_, err = io.Copy(file, stream)
 	if err != nil {
-		panic(err)
+		log.Println(err)
+		return
 	}
 
-	msg := tgbotapi.NewVideoUpload(update.Message.Chat.ID, "/tmp/video.mp4")
+	videoMsg := tgbotapi.NewVideoUpload(update.Message.Chat.ID, "/tmp/video.mp4")
+	_, err = c.bot.Send(videoMsg)
+	os.Remove("/tmp/video.mp4")
 
-	result, error := c.bot.Send(msg)
-	log.Println(result)
-	log.Println(error)
-
+	if err != nil {
+		errorMsg := tgbotapi.NewMessage(update.Message.Chat.ID, err.Error())
+		c.bot.Send(errorMsg)
+		log.Println(err)
+	}
 }
