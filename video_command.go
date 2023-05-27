@@ -32,7 +32,7 @@ func (c videoCommand) run(update tgbotapi.Update) {
 	log.Printf("Check download video with ID %s\n", videoId)
 
 	if videoId != "" {
-		go downloadVideo(c, videoId, update)
+		go downloadAndSendVideo(c, videoId, update)
 	}
 }
 
@@ -47,7 +47,7 @@ func extractVideoID(str string) string {
 	return ""
 }
 
-func downloadVideo(c videoCommand, videoId string, update tgbotapi.Update) {
+func downloadAndSendVideo(c videoCommand, videoId string, update tgbotapi.Update) {
 	log.Printf("Start download video with ID %s\n", videoId)
 	client := youtube.Client{}
 
