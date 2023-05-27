@@ -11,6 +11,12 @@ import (
 	tgbotapi "gopkg.in/telegram-bot-api.v4"
 )
 
+const (
+	CommandPrefix = "/download"
+	DownloadDir   = "/tmp"
+	FilePattern   = "*.mp4"
+)
+
 type videoCommand struct {
 	bot *tgbotapi.BotAPI
 }
@@ -18,7 +24,7 @@ type videoCommand struct {
 func (c videoCommand) canRun(update tgbotapi.Update) bool {
 	ln := strings.ToLower(update.Message.Text)
 
-	return strings.HasPrefix(ln, "/download") && strings.Contains(ln, "youtube.com/watch")
+	return strings.HasPrefix(ln, CommandPrefix) && strings.Contains(ln, "youtube.com/watch")
 }
 
 func (c videoCommand) run(update tgbotapi.Update) {
@@ -57,7 +63,7 @@ func downloadVideo(c videoCommand, videoId string, update tgbotapi.Update) {
 		return
 	}
 
-	file, err := os.Create("/tmp/video.mp4")
+	file, err := os.CreateTemp(DownloadDir, FilePattern)
 	if err != nil {
 		log.Println(err)
 		return
@@ -71,9 +77,9 @@ func downloadVideo(c videoCommand, videoId string, update tgbotapi.Update) {
 		return
 	}
 
-	videoMsg := tgbotapi.NewVideoUpload(update.Message.Chat.ID, "/tmp/video.mp4")
+	videoMsg := tgbotapi.NewVideoUpload(update.Message.Chat.ID, file.Name())
 	_, err = c.bot.Send(videoMsg)
-	os.Remove("/tmp/video.mp4")
+	os.Remove(file.Name())
 
 	if err != nil {
 		errorMsg := tgbotapi.NewMessage(update.Message.Chat.ID, err.Error())
