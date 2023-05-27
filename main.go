@@ -40,9 +40,11 @@ func main() {
 		buttCommand{bot},
 		yesCommand{bot},
 		stickerCommand{bot},
+		videoCommand{bot},
 	}
 
 	fmt.Printf("Authorized on account %s\n", bot.Self.UserName)
+	fmt.Printf(webhookUrl + webhookPath + bot.Token)
 
 	_, err = bot.SetWebhook(tgbotapi.NewWebhook(webhookUrl + webhookPath + bot.Token))
 	if err != nil {
@@ -58,6 +60,8 @@ func main() {
 		log.Printf("Telegram callback failed: %s", info.LastErrorMessage)
 	}
 
+	log.Printf(baseUrl)
+	log.Printf(webhookPath + bot.Token)
 	updates := bot.ListenForWebhook(webhookPath + bot.Token)
 	go http.ListenAndServe(baseUrl, nil)
 
