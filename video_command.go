@@ -32,7 +32,7 @@ func (c videoCommand) run(update tgbotapi.Update) {
 	log.Printf("Check download video with ID %s\n", videoId)
 
 	if videoId != "" {
-		downloadVideo(c, videoId, update)
+		go downloadVideo(c, videoId, update)
 	}
 }
 
@@ -64,12 +64,12 @@ func downloadVideo(c videoCommand, videoId string, update tgbotapi.Update) {
 	}
 
 	file, err := os.CreateTemp(DownloadDir, FilePattern)
+	defer file.Close()
+
 	if err != nil {
 		log.Println(err)
 		return
 	}
-
-	defer file.Close()
 
 	_, err = io.Copy(file, stream)
 	if err != nil {
