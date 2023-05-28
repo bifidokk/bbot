@@ -44,9 +44,9 @@ func (c boobCommand) run(update tgbotapi.Update) {
 
 func (c boobCommand) getRandomItem() (*Feed, error) {
 	url := ApiURL + "0/1/random"
-	feed, error := c.requestItems(url)
+	feed, err := c.requestItems(url)
 
-	return feed, error
+	return feed, err
 }
 
 func (c boobCommand) requestItems(url string) (*Feed, error) {

@@ -43,9 +43,9 @@ func (c buttCommand) run(update tgbotapi.Update) {
 
 func (c buttCommand) getRandomItem() (*Feed, error) {
 	url := ButtApiURL + "0/1/random"
-	feed, error := c.requestItems(url)
+	feed, err := c.requestItems(url)
 
-	return feed, error
+	return feed, err
 }
 
 func (c buttCommand) requestItems(url string) (*Feed, error) {
