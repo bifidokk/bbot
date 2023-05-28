@@ -1,10 +1,13 @@
 package main
 
 import (
+	"context"
 	"encoding/json"
 	"io/ioutil"
+	"log"
 	"net/http"
 	"strings"
+	"time"
 
 	tgbotapi "gopkg.in/telegram-bot-api.v4"
 )
@@ -25,7 +28,12 @@ func (c buttCommand) canRun(update tgbotapi.Update) bool {
 }
 
 func (c buttCommand) run(update tgbotapi.Update) {
-	feed, _ := c.getRandomItem()
+	feed, err := c.getRandomItem()
+
+	if err != nil {
+		log.Println(err)
+		return
+	}
 
 	for _, item := range feed.Items {
 		msg := tgbotapi.NewMessage(update.Message.Chat.ID, ButtMediaURL+item.Preview)
@@ -41,7 +49,13 @@ func (c buttCommand) getRandomItem() (*Feed, error) {
 }
 
 func (c buttCommand) requestItems(url string) (*Feed, error) {
-	resp, err := http.Get(url)
+	ctx, cancel := context.WithTimeout(context.Background(), time.Duration(time.Millisecond*Timeout))
+	defer cancel()
+
+	req, err := http.NewRequestWithContext(ctx, http.MethodGet, url, nil)
+	client := &http.Client{}
+
+	resp, err := client.Do(req)
 
 	if err != nil {
 		return nil, err
