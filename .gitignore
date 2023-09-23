@@ -15,4 +15,6 @@
 # vendor/
 
 /.idea
+/.vscode
 deploy_key
+__debug*
