@@ -1,13 +1,8 @@
 package main
 
 import (
-	"context"
-	"encoding/json"
-	"io"
 	"log"
-	"net/http"
 	"strings"
-	"time"
 
 	tgbotapi "gopkg.in/telegram-bot-api.v4"
 )
@@ -20,6 +15,7 @@ const (
 
 type boobCommand struct {
 	bot *tgbotapi.BotAPI
+	photo *PhotoApi
 }
 
 func (c boobCommand) canRun(update tgbotapi.Update) bool {
@@ -29,7 +25,7 @@ func (c boobCommand) canRun(update tgbotapi.Update) bool {
 }
 
 func (c boobCommand) run(update tgbotapi.Update) {
-	feed, err := c.getRandomItem()
+	feed, err := c.photo.GetRandomItem(ApiURL)
 
 	if err != nil {
 		log.Println(err)
@@ -47,42 +43,4 @@ func (c boobCommand) run(update tgbotapi.Update) {
 		msg := tgbotapi.NewPhotoUpload(update.Message.Chat.ID, filePath)
 		c.bot.Send(msg)
 	}
-}
-
-func (c boobCommand) getRandomItem() (*Feed, error) {
-	url := ApiURL + "0/1/random"
-	feed, err := c.requestItems(url)
-
-	return feed, err
-}
-
-func (c boobCommand) requestItems(url string) (*Feed, error) {
-	ctx, cancel := context.WithTimeout(context.Background(), time.Duration(time.Millisecond*Timeout))
-	defer cancel()
-
-	req, err := http.NewRequestWithContext(ctx, http.MethodGet, url, nil)
-	if err != nil {
-		return nil, err
-	}
-
-	resp, err := http.DefaultClient.Do(req)
-
-	if err != nil {
-		return nil, err
-	}
-
-	defer resp.Body.Close()
-	body, _ := io.ReadAll(resp.Body)
-
-	var items []Item
-	err = json.Unmarshal(body, &items)
-
-	if err != nil {
-		return nil, err
-	}
-
-	feed := new(Feed)
-	feed.Items = items
-
-	return feed, nil
 }

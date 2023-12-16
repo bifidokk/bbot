@@ -7,14 +7,6 @@ import (
 	"net/http"
 )
 
-type Feed struct {
-	Items []Item
-}
-
-type Item struct {
-	Preview string
-}
-
 type command interface {
 	canRun(update tgbotapi.Update) bool
 	run(update tgbotapi.Update)
@@ -35,9 +27,11 @@ func main() {
 		panic(err)
 	}
 
+	var apiService = NewPhotoApi()
+
 	var commands = []command{
-		boobCommand{bot},
-		buttCommand{bot},
+		boobCommand{bot, apiService},
+		buttCommand{bot, apiService},
 		yesCommand{bot},
 		stickerCommand{bot},
 		videoCommand{bot},
