@@ -3,7 +3,7 @@ package main
 import (
 	"context"
 	"encoding/json"
-	"io/ioutil"
+	"io"
 	"log"
 	"net/http"
 	"strings"
@@ -36,7 +36,14 @@ func (c buttCommand) run(update tgbotapi.Update) {
 	}
 
 	for _, item := range feed.Items {
-		msg := tgbotapi.NewMessage(update.Message.Chat.ID, ButtMediaURL+item.Preview)
+		filePath, err := downloadFileFromURL(ButtMediaURL + item.Preview)
+
+		if err != nil {
+			log.Println(err)
+			return
+		}
+
+		msg := tgbotapi.NewPhotoUpload(update.Message.Chat.ID, filePath)
 		c.bot.Send(msg)
 	}
 }
@@ -60,7 +67,7 @@ func (c buttCommand) requestItems(url string) (*Feed, error) {
 	}
 
 	defer resp.Body.Close()
-	body, _ := ioutil.ReadAll(resp.Body)
+	body, _ := io.ReadAll(resp.Body)
 
 	var items []Item
 	err = json.Unmarshal(body, &items)
