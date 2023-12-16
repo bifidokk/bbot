@@ -61,6 +61,10 @@ func (c boobCommand) requestItems(url string) (*Feed, error) {
 	defer cancel()
 
 	req, err := http.NewRequestWithContext(ctx, http.MethodGet, url, nil)
+	if err != nil {
+		return nil, err
+	}
+
 	resp, err := http.DefaultClient.Do(req)
 
 	if err != nil {
@@ -72,6 +76,10 @@ func (c boobCommand) requestItems(url string) (*Feed, error) {
 
 	var items []Item
 	err = json.Unmarshal(body, &items)
+
+	if err != nil {
+		return nil, err
+	}
 
 	feed := new(Feed)
 	feed.Items = items

@@ -18,7 +18,7 @@ func downloadFileFromURL(fileUrl string) (string, error) {
 	defer response.Body.Close()
 
 	if response.StatusCode != 200 {
-		return "", errors.New("Received non 200 response code")
+		return "", errors.New("received non 200 response code")
 	}
 
 	parsedURL, err := url.Parse(fileUrl)
