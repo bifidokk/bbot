@@ -1,4 +1,4 @@
-package main
+package service
 
 import (
 	"context"
@@ -8,6 +8,8 @@ import (
 	"time"
 )
 
+const Timeout = 1000
+
 type Feed struct {
 	Items []Item
 }
@@ -16,7 +18,7 @@ type Item struct {
 	Preview string
 }
 
-type PhotoApi struct {}
+type PhotoApi struct{}
 
 func NewPhotoApi() *PhotoApi {
 	return &PhotoApi{}

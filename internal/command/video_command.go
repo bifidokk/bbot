@@ -1,4 +1,4 @@
-package main
+package command
 
 import (
 	"io"
@@ -17,17 +17,17 @@ const (
 	FilePattern   = "*.mp4"
 )
 
-type videoCommand struct {
-	bot *tgbotapi.BotAPI
+type VideoCommand struct {
+	Bot *tgbotapi.BotAPI
 }
 
-func (c videoCommand) canRun(update tgbotapi.Update) bool {
+func (c VideoCommand) CanRun(update tgbotapi.Update) bool {
 	ln := strings.ToLower(update.Message.Text)
 
 	return strings.HasPrefix(ln, CommandPrefix) && strings.Contains(ln, "youtube.com/watch")
 }
 
-func (c videoCommand) run(update tgbotapi.Update) {
+func (c VideoCommand) Run(update tgbotapi.Update) {
 	videoId := extractVideoID(update.Message.Text)
 	log.Printf("Check download video with ID %s\n", videoId)
 
@@ -47,7 +47,7 @@ func extractVideoID(str string) string {
 	return ""
 }
 
-func downloadAndSendVideo(c videoCommand, videoId string, update tgbotapi.Update) {
+func downloadAndSendVideo(c VideoCommand, videoId string, update tgbotapi.Update) {
 	log.Printf("Start download video with ID %s\n", videoId)
 	client := youtube.Client{}
 
@@ -79,12 +79,12 @@ func downloadAndSendVideo(c videoCommand, videoId string, update tgbotapi.Update
 	}
 
 	videoMsg := tgbotapi.NewVideoUpload(update.Message.Chat.ID, file.Name())
-	_, err = c.bot.Send(videoMsg)
+	_, err = c.Bot.Send(videoMsg)
 	os.Remove(file.Name())
 
 	if err != nil {
 		errorMsg := tgbotapi.NewMessage(update.Message.Chat.ID, err.Error())
-		c.bot.Send(errorMsg)
+		c.Bot.Send(errorMsg)
 		log.Println(err)
 	}
 }

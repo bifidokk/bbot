@@ -1,6 +1,7 @@
-package main
+package command
 
 import (
+	"github.com/bifidokk/bbot/internal/service"
 	"log"
 	"strings"
 
@@ -12,19 +13,19 @@ const (
 	ButtMediaURL = "http://media.obutts.ru/"
 )
 
-type buttCommand struct {
-	bot *tgbotapi.BotAPI
-	photo *PhotoApi
+type ButtCommand struct {
+	Bot   *tgbotapi.BotAPI
+	Photo *service.PhotoApi
 }
 
-func (c buttCommand) canRun(update tgbotapi.Update) bool {
+func (c ButtCommand) CanRun(update tgbotapi.Update) bool {
 	ln := strings.ToLower(update.Message.Text)
 
 	return strings.Contains(ln, "жоп")
 }
 
-func (c buttCommand) run(update tgbotapi.Update) {
-	feed, err := c.photo.GetRandomItem(ButtApiURL )
+func (c ButtCommand) Run(update tgbotapi.Update) {
+	feed, err := c.Photo.GetRandomItem(ButtApiURL)
 
 	if err != nil {
 		log.Println(err)
@@ -32,7 +33,7 @@ func (c buttCommand) run(update tgbotapi.Update) {
 	}
 
 	for _, item := range feed.Items {
-		filePath, err := downloadFileFromURL(ButtMediaURL + item.Preview)
+		filePath, err := service.DownloadFileFromURL(ButtMediaURL + item.Preview)
 
 		if err != nil {
 			log.Println(err)
@@ -40,6 +41,10 @@ func (c buttCommand) run(update tgbotapi.Update) {
 		}
 
 		msg := tgbotapi.NewPhotoUpload(update.Message.Chat.ID, filePath)
-		c.bot.Send(msg)
+		_, err = c.Bot.Send(msg)
+
+		if err != nil {
+			return
+		}
 	}
 }

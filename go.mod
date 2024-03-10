@@ -1,4 +1,4 @@
-module bbot
+module github.com/bifidokk/bbot
 
 go 1.17
 

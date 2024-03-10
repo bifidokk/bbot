@@ -1,22 +1,25 @@
 package main
 
 import (
+	"github.com/bifidokk/bbot/internal/command"
+	"github.com/bifidokk/bbot/internal/config"
+	"github.com/bifidokk/bbot/internal/service"
 	tgbotapi "gopkg.in/telegram-bot-api.v4"
 	"log"
 	"net/http"
 )
 
-type command interface {
-	canRun(update tgbotapi.Update) bool
-	run(update tgbotapi.Update)
+type Command interface {
+	CanRun(update tgbotapi.Update) bool
+	Run(update tgbotapi.Update)
 }
 
 func main() {
-	botToken := getEnv("token")
-	webhookUrl := getEnv("webhook_url")
-	baseUrl := getEnv("base_url")
+	botToken := config.GetEnv("token")
+	webhookUrl := config.GetEnv("webhook_url")
+	baseUrl := config.GetEnv("base_url")
 
-	webhookPath := getEnv("webhook_path")
+	webhookPath := config.GetEnv("webhook_path")
 	if len(webhookPath) == 0 {
 		webhookPath = "/"
 	}
@@ -26,14 +29,14 @@ func main() {
 		panic(err)
 	}
 
-	var apiService = NewPhotoApi()
+	var apiService = service.NewPhotoApi()
 
-	var commands = []command{
-		boobCommand{bot, apiService},
-		buttCommand{bot, apiService},
-		yesCommand{bot},
-		stickerCommand{bot},
-		videoCommand{bot},
+	var commands = []Command{
+		command.BoobCommand{Bot: bot, Photo: apiService},
+		command.ButtCommand{Bot: bot, Photo: apiService},
+		command.YesCommand{bot},
+		command.StickerCommand{bot},
+		command.VideoCommand{bot},
 	}
 
 	log.Printf("Authorized on account %s\n", bot.Self.UserName)
@@ -62,8 +65,8 @@ func main() {
 		}
 
 		for _, c := range commands {
-			if c.canRun(update) {
-				c.run(update)
+			if c.CanRun(update) {
+				c.Run(update)
 			}
 		}
 	}

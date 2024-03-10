@@ -1,4 +1,4 @@
-package main
+package config
 
 import (
 	"fmt"
@@ -11,7 +11,7 @@ func init() {
 	viper.SetEnvPrefix("bbot")
 }
 
-func getEnv(key string) string {
+func GetEnv(key string) string {
 	value, ok := viper.Get(key).(string)
 
 	if !ok {

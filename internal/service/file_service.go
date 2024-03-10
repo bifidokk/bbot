@@ -1,4 +1,4 @@
-package main
+package service
 
 import (
 	"errors"
@@ -9,7 +9,7 @@ import (
 	"path"
 )
 
-func downloadFileFromURL(fileUrl string) (string, error) {
+func DownloadFileFromURL(fileUrl string) (string, error) {
 	response, err := http.Get(fileUrl)
 	if err != nil {
 		return "", err
