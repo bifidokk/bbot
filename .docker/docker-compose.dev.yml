@@ -1,0 +1,45 @@
+version: '3'
+
+services:
+  postgres:
+    image: postgres:14.1
+    container_name: bbot_db
+    ports:
+      - "5432:5432"
+    restart: always
+    environment:
+      POSTGRES_PASSWORD: postgres
+    volumes:
+      - ./db/:/var/lib/postgresql/data/:rw
+      - ./postgres/init:/docker-entrypoint-initdb.d
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  api:
+    container_name: bbot_app
+    build:
+      context: ../
+      dockerfile: ./.docker/app/Dockerfile.dev
+    ports:
+      - "8081:8080"
+    restart: always
+    depends_on:
+      postgres:
+        condition: service_healthy
+    env_file:
+      - bbot_dev.env
+
+  migrations:
+    container_name: bbot_migrations
+    build:
+      context: ../
+      dockerfile: ./.docker/migrations/Dockerfile.dev
+    command: migrate apply --url ${POSTGRES_MIGRATION_DSN} --dir "file://migrations"
+    depends_on:
+      postgres:
+        condition: service_healthy
+    env_file:
+      - bbot_dev.env

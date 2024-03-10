@@ -18,3 +18,5 @@
 /.vscode
 deploy_key
 __debug*
+/.docker/db/
+/.docker/bbot_dev.env

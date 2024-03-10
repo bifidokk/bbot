@@ -1,7 +1,6 @@
 package main
 
 import (
-	"fmt"
 	tgbotapi "gopkg.in/telegram-bot-api.v4"
 	"log"
 	"net/http"
@@ -37,8 +36,8 @@ func main() {
 		videoCommand{bot},
 	}
 
-	fmt.Printf("Authorized on account %s\n", bot.Self.UserName)
-	fmt.Printf(webhookUrl + webhookPath)
+	log.Printf("Authorized on account %s\n", bot.Self.UserName)
+	log.Println(webhookUrl + webhookPath)
 
 	_, err = bot.SetWebhook(tgbotapi.NewWebhook(webhookUrl + webhookPath + bot.Token))
 	if err != nil {
