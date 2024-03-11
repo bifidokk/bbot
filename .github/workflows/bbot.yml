@@ -16,4 +16,4 @@ jobs:
         uses: actions/checkout@v2
       - run: go mod download
       - name: Build
-        run: go build
+        run: go build ./cmd/app/main.go
