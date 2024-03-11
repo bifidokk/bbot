@@ -18,7 +18,7 @@ services:
       timeout: 5s
       retries: 5
 
-  api:
+  app:
     container_name: bbot_app
     build:
       context: ../
