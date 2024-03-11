@@ -1,6 +1,6 @@
 module github.com/bifidokk/bbot
 
-go 1.17
+go 1.21
 
 require (
 	github.com/kkdai/youtube/v2 v2.8.0
