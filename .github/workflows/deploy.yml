@@ -35,3 +35,18 @@ jobs:
           file: ./.docker/migrations/Dockerfile
           push: true
           tags: bifidokk/bbot-migrations:latest
+
+      - name: Restart Docker compose with fresh images
+        uses: appleboy/ssh-action@v0.1.10
+        with:
+          host: ${{ secrets.HOST }}
+          username: ${{ secrets.USERNAME }}
+          key: ${{ secrets.KEY }}
+          script_stop: true
+          script: |
+            cd /var/www/bbot
+            git pull
+            docker image prune --all --force
+            docker compose --file ./.docker/docker-compose.yml --env-file ./.docker/.env.prod pull
+            docker compose --file ./.docker/docker-compose.yml --env-file ./.docker/.env.prod down
+            docker compose --file ./.docker/docker-compose.yml --env-file ./.docker/.env.prod up -d
