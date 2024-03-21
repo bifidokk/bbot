@@ -13,5 +13,4 @@ RUN apk add --no-cache ca-certificates libc6-compat
 WORKDIR /app
 COPY --from=builder /app .
 
-EXPOSE 9003
 CMD ["./main"]
