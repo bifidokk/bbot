@@ -3,6 +3,7 @@ package main
 import (
 	"github.com/bifidokk/bbot/internal/command"
 	"github.com/bifidokk/bbot/internal/config"
+	"github.com/bifidokk/bbot/internal/middleware"
 	"github.com/bifidokk/bbot/internal/service"
 	tgbotapi "gopkg.in/telegram-bot-api.v4"
 	"log"
@@ -12,6 +13,10 @@ import (
 type Command interface {
 	CanRun(update tgbotapi.Update) bool
 	Run(update tgbotapi.Update)
+}
+
+type Middleware interface {
+	Handle(update tgbotapi.Update)
 }
 
 func main() {
@@ -29,14 +34,23 @@ func main() {
 		panic(err)
 	}
 
+	db, err := config.ConnectDb()
+	if err != nil {
+		panic(err)
+	}
+
 	var apiService = service.NewPhotoApi()
 
 	var commands = []Command{
 		command.BoobCommand{Bot: bot, Photo: apiService},
 		command.ButtCommand{Bot: bot, Photo: apiService},
-		command.YesCommand{bot},
-		command.StickerCommand{bot},
-		command.VideoCommand{bot},
+		command.YesCommand{Bot: bot},
+		command.StickerCommand{Bot: bot},
+		command.VideoCommand{Bot: bot},
+	}
+
+	var middlewares = []Middleware{
+		middleware.NewChatMiddleware(db),
 	}
 
 	log.Printf("Authorized on account %s\n", bot.Self.UserName)
@@ -57,9 +71,18 @@ func main() {
 	}
 
 	updates := bot.ListenForWebhook(webhookPath + bot.Token)
-	go http.ListenAndServe(baseUrl, nil)
+	go func() {
+		err := http.ListenAndServe(baseUrl, nil)
+		if err != nil {
+			panic(err)
+		}
+	}()
 
 	for update := range updates {
+		for _, m := range middlewares {
+			m.Handle(update)
+		}
+
 		if update.Message == nil { // ignore any non-Message Updates
 			continue
 		}

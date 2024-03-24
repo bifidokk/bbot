@@ -24,7 +24,7 @@ services:
       context: ../
       dockerfile: ./.docker/app/Dockerfile.dev
     ports:
-      - "8081:8080"
+      - "8080:8080"
     restart: always
     depends_on:
       postgres:
