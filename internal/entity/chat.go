@@ -4,10 +4,11 @@ import "time"
 
 type Chat struct {
 	ID         uint      `gorm:"primary_key" json:"id"`
-	TelegramID uint      `gorm:"not null" json:"telegram_id"`
+	TelegramID string    `gorm:"type:VARCHAR(255) not null" json:"telegram_id"`
 	Title      string    `gorm:"type:VARCHAR(255)" json:"title"`
-	CreatedAt  time.Time `json:"created_at"`
-	UpdatedAt  time.Time `json:"updated_at"`
+	Type       string    `gorm:"type:VARCHAR(64) not null" json:"type"`
+	CreatedAt  time.Time `gorm:"type:timestamp" json:"created_at"`
+	UpdatedAt  time.Time `gorm:"type:timestamp" json:"updated_at"`
 }
 
 func (Chat) TableName() string {

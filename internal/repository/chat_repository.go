@@ -10,7 +10,8 @@ type userRepository struct {
 }
 
 type ChatRepository interface {
-	Create(user *entity.Chat) (*entity.Chat, error)
+	Create(chat *entity.Chat) (*entity.Chat, error)
+	FindByTelegramId(id string) (*entity.Chat, error)
 }
 
 func NewChatRepository(db *gorm.DB) ChatRepository {
@@ -21,6 +22,13 @@ func NewChatRepository(db *gorm.DB) ChatRepository {
 
 func (r *userRepository) Create(chat *entity.Chat) (*entity.Chat, error) {
 	result := r.database.Create(&chat)
+
+	return chat, result.Error
+}
+
+func (r *userRepository) FindByTelegramId(id string) (*entity.Chat, error) {
+	var chat *entity.Chat
+	result := r.database.Where(&entity.Chat{TelegramID: id}).First(&chat)
 
 	return chat, result.Error
 }

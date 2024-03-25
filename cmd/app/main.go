@@ -4,6 +4,7 @@ import (
 	"github.com/bifidokk/bbot/internal/command"
 	"github.com/bifidokk/bbot/internal/config"
 	"github.com/bifidokk/bbot/internal/middleware"
+	"github.com/bifidokk/bbot/internal/repository"
 	"github.com/bifidokk/bbot/internal/service"
 	tgbotapi "gopkg.in/telegram-bot-api.v4"
 	"log"
@@ -49,8 +50,10 @@ func main() {
 		command.VideoCommand{Bot: bot},
 	}
 
+	var chatRepository = repository.NewChatRepository(db)
+
 	var middlewares = []Middleware{
-		middleware.NewChatMiddleware(db),
+		middleware.NewChatMiddleware(chatRepository),
 	}
 
 	log.Printf("Authorized on account %s\n", bot.Self.UserName)
