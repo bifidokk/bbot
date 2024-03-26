@@ -25,6 +25,10 @@ func NewChatMiddleware(repository repository.ChatRepository) ChatMiddleware {
 }
 
 func (m *chatMiddleware) Handle(update tgbotapi.Update) {
+	if update.Message == nil || update.Message.Chat == nil {
+		return
+	}
+
 	chatID := strconv.FormatInt(update.Message.Chat.ID, 10)
 	_, err := m.chatRepository.FindByTelegramId(chatID)
 
